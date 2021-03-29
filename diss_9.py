@@ -3,6 +3,8 @@ import re
 import requests
 import unittest
 
+# By Amanda Rudolph
+
 # Task 1: Get the URL that links to the Pokemon Charmander's webpage.
 # HINT: You will have to add https://pokemondb.net to the URL retrieved using BeautifulSoup
 def getCharmanderLink(soup):
@@ -11,46 +13,48 @@ def getCharmanderLink(soup):
     print(anchor2)
     anchor3 = anchor2.find('a')['href']
     return 'https://polemondb.net' + anchor3
-
 # Task 2: Get the details from the box below "Egg moves". Get all the move names and store
 #         them into a list. The function should return that list of moves.
 def getEggMoves(pokemon):
     url = 'https://pokemondb.net/pokedex/'+pokemon
-    #add code here 
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.text,'html.parser')
+    anchor = soup.find_all('table', class_ = 'data-table')[2]
+    anchors = anchor.find_all('tr')
+    list_of_eggs = []
+    for row in anchors[1:]:
+        content = row.find('a', class_ = 'ent-name').text.strip()
+        list_of_eggs.append(content)
+    return list_of_eggs
 
 # Task 3: Create a regex expression that will find all the times that have these formats: @2pm @5 pm @10am
 # Return a list of these times without the '@' symbol. E.g. ['2pm', '5 pm', '10am']
 def findLetters(sentences):
     # initialize an empty list
-    empty_list = []
+    empty_list =[]
 
     # define the regular expression
-    regex_times = #MAKE EXPRESSION
-    
+    regex_times = '@\d+ ?[ap]m'
+
     # loop through each sentence or phrase in sentences
-    sentence_list = sentence.split(",")
     for sen in sentence:
     # find all the words that match the regular expression in each sentence
         matches= re.findall(regex_times, sen)
     # loop through the found words and add the words to your empty list
-    for word in matches:
+    for word in sentence:
+        word = word.strip('@')
         empty_list.append(word)
 
     #return the list of the last letter of all words that begin or end with a capital letter
-    newlist = []
-    for word in empty_list:
-        if word[0] == word[0].upper():
-            new_list.append(word[0])
-        if word[-1] == word[-1].upper():
-            new_list.append(word[1])
-    return new_list  #Not sure if this indented correctly .... 
+    return empty_list
 
-def main():
-    url = 'https://pokemondb.net/pokedex/national'
-    r = requests.get(url)
-    soup = BeautifulSoup(r.text, 'html.parser')
-    getCharmanderLink(soup)
-    getEggMoves('scizor')
+
+    def main():
+        url = 'https://pokemondb.net/pokedex/national'
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        getCharmanderLink(soup)
+        getEggMoves('scizor')
 
 class TestAllMethods(unittest.TestCase):
     def setUp(self):
